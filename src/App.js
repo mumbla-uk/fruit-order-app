@@ -31,7 +31,7 @@ function App() {
   // Values like '1/2' are represented as 0.5.
   // For prep items, their 'par' acts as a flag for when they should appear,
   // and also indicates their typical order size for display.
-  const parLevelsByDay = {
+  const parLevelsByDay = { // This is the object definition, starts with {
     'Limes': { 'Monday': 2, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 3, 'Friday': 3, 'Saturday': 3, 'Sunday': 0 },
     'Lemons': { 'Monday': 0.5, 'Tuesday': 0.5, 'Wednesday': 0.5, 'Thursday': 1, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
     'Oranges': { 'Monday': 8, 'Tuesday': 12, 'Wednesday': 12, 'Thursday': 12, 'Friday': 16, 'Saturday': 16, 'Sunday': 0 },
@@ -55,7 +55,7 @@ function App() {
     'Pears': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
     'Chillies': { 'Monday': 0, 'Tuesday': 800, 'Wednesday': 800, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
     'Blueberries': { 'Monday': 0, 'Tuesday': 500, 'Wednesday': 500, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-  ];
+  }; // <--- THIS IS THE LINE THAT WAS CHANGED from ]; to };
 
   // State to hold the list of fruits with their par levels and current counts
   const [fruitData, setFruitData] = useState([]);
