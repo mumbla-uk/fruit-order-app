@@ -1,23 +1,10 @@
-/* src/index.css or src/App.css */
+/* src/index.css (or App.css) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Your existing CSS or custom styles will go below these directives */
 body {
-  font-family: 'Inter', sans-serif; /* Recommended font as per instructions */
+  font-family: 'Inter', sans-serif;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* Any other custom CSS you might have can go below these lines */
