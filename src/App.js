@@ -55,7 +55,7 @@ function App() {
     'Pears': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
     'Chillies': { 'Monday': 0, 'Tuesday': 800, 'Wednesday': 800, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
     'Blueberries': { 'Monday': 0, 'Tuesday': 500, 'Wednesday': 500, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-  };
+  ];
 
   // State to hold the list of fruits with their par levels and current counts
   const [fruitData, setFruitData] = useState([]);
@@ -116,7 +116,7 @@ function App() {
     setFruitData(filteredFruitData);
     setOrderList([]); // Clear previous order list when day changes
     setMessage(''); // Clear message
-  }, [dayOfWeek]); // Re-run this effect whenever dayOfWeek changes
+  }, [dayOfWeek, initialFruitsAndMediums, parLevelsByDay]); // Added initialFruitsAndMediums and parLevelsByDay to dependencies
 
   /**
    * Handles changes to the current count input for a specific fruit.
