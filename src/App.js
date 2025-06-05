@@ -119,7 +119,7 @@ function App() {
     setFruitData(filteredFruitData);
     setOrderList([]); // Clear previous order list when day changes
     setMessage(''); // Clear message
-  }, [dayOfWeek, getDeliveryDay]); // Removed initialFruitsAndMediums and parLevelsByDay as they are now stable constants
+  }, [dayOfWeek, getDeliveryDay]);
 
   /**
    * Handles changes to the current count input for a specific fruit.
@@ -369,11 +369,11 @@ function App() {
                   <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider sm:text-sm rounded-tl-lg">
                     Item
                   </th>
-                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider sm:text-sm">
-                    Par Level ({deliveryDayForDisplay})
-                  </th>
-                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider sm:px-2 sm:text-xxs rounded-tr-lg">
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider sm:px-2 sm:text-xxs">
                     Current Count
+                  </th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider sm:text-sm rounded-tr-lg">
+                    Par Level ({deliveryDayForDisplay})
                   </th>
                 </tr>
               </thead>
@@ -383,10 +383,7 @@ function App() {
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 sm:text-base">
                       {fruit.name}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 sm:text-base">
-                      {/* Display par level, format as 0.5 if it's a fraction */}
-                      {formatQuantityWithUnit(fruit.par, fruit.medium)}
-                    </td>
+                    {/* Current Count Cell */}
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 sm:text-base">
                       <div className="flex items-center space-x-2">
                         <button
@@ -411,6 +408,11 @@ function App() {
                           +
                         </button>
                       </div>
+                    </td>
+                    {/* Par Level Cell (now after Current Count) */}
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 sm:text-base">
+                      {/* Display par level, format as 0.5 if it's a fraction */}
+                      {formatQuantityWithUnit(fruit.par, fruit.medium)}
                     </td>
                   </tr>
                 ))}
