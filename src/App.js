@@ -1,62 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Import useCallback
+
+// Initial list of fruits/items with their names, associated ordering medium,
+// and step interval for increment/decrement buttons (for gram items).
+// MOVED OUTSIDE COMPONENT TO PREVENT RE-CREATION ON EVERY RENDER
+const initialFruitsAndMediums = [
+  { name: 'Limes', medium: 'case' },
+  { name: 'Lemons', medium: 'case' },
+  { name: 'Oranges', medium: '' },
+  { name: 'Grapefruit', medium: '' },
+  { name: 'Cucumber', medium: '' },
+  { name: 'Mint', medium: 'small bag of' },
+  { name: 'Apples', medium: '' },
+  { name: 'Raspberries', medium: '' },
+  { name: 'Violas', medium: '' },
+  { name: 'Lime Juice', medium: '' },
+  { name: 'Lemon Juice', medium: '' },
+  { name: 'Eggs', medium: 'tray of' },
+  { name: 'Milk', medium: '' },
+  { name: 'Oat Milk', medium: 'carton of' },
+  // New prep items
+  { name: 'Strawberries', medium: 'g', stepInterval: 200 },
+  { name: 'Carrots', medium: 'g', stepInterval: 200 },
+  { name: 'Pears', medium: 'g', stepInterval: 200 },
+  { name: 'Chillies', medium: 'g', stepInterval: 200 },
+  { name: 'Blueberries', medium: 'g', stepInterval: 250 },
+];
+
+// Specific par levels for each item by day of the week (delivery day).
+// Values like '1/2' are represented as 0.5.
+// For prep items, their 'par' acts as a flag for when they should appear,
+// and also indicates their typical order size for display.
+// MOVED OUTSIDE COMPONENT TO PREVENT RE-CREATION ON EVERY RENDER
+const parLevelsByDay = {
+  'Limes': { 'Monday': 2, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 3, 'Friday': 3, 'Saturday': 3, 'Sunday': 0 },
+  'Lemons': { 'Monday': 0.5, 'Tuesday': 0.5, 'Wednesday': 0.5, 'Thursday': 1, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
+  'Oranges': { 'Monday': 8, 'Tuesday': 12, 'Wednesday': 12, 'Thursday': 12, 'Friday': 16, 'Saturday': 16, 'Sunday': 0 },
+  'Grapefruit': { 'Monday': 6, 'Tuesday': 4, 'Wednesday': 4, 'Thursday': 6, 'Friday': 6, 'Saturday': 4, 'Sunday': 0 },
+  'Cucumber': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
+  'Mint': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 1, 'Sunday': 0 },
+  'Apples': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
+  'Raspberries': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 4, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
+  // Violas: Par levels set to 0 for Mon, Tue, Wed delivery (Sun, Mon, Tue ordering)
+  'Violas': { 'Monday': 0, 'Tuesday': 0, 'Wednesday': 0, 'Thursday': 2, 'Friday': 2, 'Saturday': 0, 'Sunday': 0 },
+  'Lime Juice': { 'Monday': 3, 'Tuesday': 3, 'Wednesday': 3, 'Thursday': 4, 'Friday': 6, 'Saturday': 6, 'Sunday': 0 },
+  'Lemon Juice': { 'Monday': 2, 'Tuesday': 2, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4, 'Saturday': 3, 'Sunday': 0 },
+  'Eggs': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
+  'Milk': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
+  // Oat Milk: Par levels for each day. Filtering logic will hide it if par < 1.
+  'Oat Milk': { 'Monday': 0, 'Tuesday': 0, 'Wednesday': 0, 'Thursday': 0, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
+  // Par levels for new prep items (delivery days: Tuesday, Wednesday)
+  // These pars are now just for display/calculation, not for visibility filtering.
+  'Strawberries': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
+  'Carrots': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
+  'Pears': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
+  'Chillies': { 'Monday': 0, 'Tuesday': 800, 'Wednesday': 800, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
+  'Blueberries': { 'Monday': 0, 'Tuesday': 500, 'Wednesday': 500, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
+};
 
 // Main App component for the Fruit Order List Generator
 function App() {
-  // Initial list of fruits/items with their names, associated ordering medium,
-  // and step interval for increment/decrement buttons (for gram items).
-  const initialFruitsAndMediums = [
-    { name: 'Limes', medium: 'case' },
-    { name: 'Lemons', medium: 'case' },
-    { name: 'Oranges', medium: '' },
-    { name: 'Grapefruit', medium: '' },
-    { name: 'Cucumber', medium: '' },
-    { name: 'Mint', medium: 'small bag of' },
-    { name: 'Apples', medium: '' },
-    { name: 'Raspberries', medium: '' },
-    { name: 'Violas', medium: '' },
-    { name: 'Lime Juice', medium: '' },
-    { name: 'Lemon Juice', medium: '' },
-    { name: 'Eggs', medium: 'tray of' },
-    { name: 'Milk', medium: '' },
-    { name: 'Oat Milk', medium: 'carton of' },
-    // New prep items
-    { name: 'Strawberries', medium: 'g', stepInterval: 200 },
-    { name: 'Carrots', medium: 'g', stepInterval: 200 },
-    { name: 'Pears', medium: 'g', stepInterval: 200 },
-    { name: 'Chillies', medium: 'g', stepInterval: 200 },
-    { name: 'Blueberries', medium: 'g', stepInterval: 250 },
-  ];
-
-  // Specific par levels for each item by day of the week (delivery day).
-  // Values like '1/2' are represented as 0.5.
-  // For prep items, their 'par' acts as a flag for when they should appear,
-  // and also indicates their typical order size for display.
-  const parLevelsByDay = {
-    'Limes': { 'Monday': 2, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 3, 'Friday': 3, 'Saturday': 3, 'Sunday': 0 },
-    'Lemons': { 'Monday': 0.5, 'Tuesday': 0.5, 'Wednesday': 0.5, 'Thursday': 1, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
-    'Oranges': { 'Monday': 8, 'Tuesday': 12, 'Wednesday': 12, 'Thursday': 12, 'Friday': 16, 'Saturday': 16, 'Sunday': 0 },
-    'Grapefruit': { 'Monday': 6, 'Tuesday': 4, 'Wednesday': 4, 'Thursday': 6, 'Friday': 6, 'Saturday': 4, 'Sunday': 0 },
-    'Cucumber': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
-    'Mint': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 1, 'Sunday': 0 },
-    'Apples': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
-    'Raspberries': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 4, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
-    // Violas: Par levels set to 0 for Mon, Tue, Wed delivery (Sun, Mon, Tue ordering)
-    'Violas': { 'Monday': 0, 'Tuesday': 0, 'Wednesday': 0, 'Thursday': 2, 'Friday': 2, 'Saturday': 0, 'Sunday': 0 },
-    'Lime Juice': { 'Monday': 3, 'Tuesday': 3, 'Wednesday': 3, 'Thursday': 4, 'Friday': 6, 'Saturday': 6, 'Sunday': 0 },
-    'Lemon Juice': { 'Monday': 2, 'Tuesday': 2, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4, 'Saturday': 3, 'Sunday': 0 },
-    'Eggs': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
-    'Milk': { 'Monday': 1, 'Tuesday': 1, 'Wednesday': 1, 'Thursday': 2, 'Friday': 2, 'Saturday': 2, 'Sunday': 0 },
-    // Oat Milk: Par levels for each day. Filtering logic will hide it if par < 1.
-    'Oat Milk': { 'Monday': 0, 'Tuesday': 0, 'Wednesday': 0, 'Thursday': 0, 'Friday': 1, 'Saturday': 1, 'Sunday': 0 },
-    // Par levels for new prep items (delivery days: Tuesday, Wednesday)
-    // These pars are now just for display/calculation, not for visibility filtering.
-    'Strawberries': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-    'Carrots': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-    'Pears': { 'Monday': 0, 'Tuesday': 1000, 'Wednesday': 1000, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-    'Chillies': { 'Monday': 0, 'Tuesday': 800, 'Wednesday': 800, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-    'Blueberries': { 'Monday': 0, 'Tuesday': 500, 'Wednesday': 500, 'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0 },
-  };
-
   // State to hold the list of fruits with their par levels and current counts
   const [fruitData, setFruitData] = useState([]);
   // State variable to store the calculated order list
@@ -72,10 +74,11 @@ function App() {
 
   /**
    * Helper function to get the delivery day based on the ordering day.
+   * Wrapped in useCallback to prevent it from changing on every render.
    * @param {string} orderingDay - The day the order is being placed.
    * @returns {string} The day the order will be delivered.
    */
-  const getDeliveryDay = (orderingDay) => {
+  const getDeliveryDay = useCallback((orderingDay) => {
     const deliveryDayMap = {
       'Monday': 'Tuesday',
       'Tuesday': 'Wednesday',
@@ -85,7 +88,7 @@ function App() {
       'Sunday': 'Monday', // Ordering on Sunday is for Monday delivery
     };
     return deliveryDayMap[orderingDay];
-  };
+  }, []); // Empty dependency array means this function is created once
 
   // useEffect to initialize fruit data with the defined par levels for the *delivery* day
   // and reset counts when the component mounts or when the selected day of the week changes.
@@ -116,7 +119,7 @@ function App() {
     setFruitData(filteredFruitData);
     setOrderList([]); // Clear previous order list when day changes
     setMessage(''); // Clear message
-  }, [dayOfWeek, initialFruitsAndMediums, parLevelsByDay, getDeliveryDay]); // FIX APPLIED HERE: Added getDeliveryDay to dependencies
+  }, [dayOfWeek, getDeliveryDay]); // Removed initialFruitsAndMediums and parLevelsByDay as they are now stable constants
 
   /**
    * Handles changes to the current count input for a specific fruit.
