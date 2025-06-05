@@ -89,8 +89,9 @@ function App() {
 
   // useEffect to initialize fruit data with the defined par levels for the *delivery* day
   // and reset counts when the component mounts or when the selected day of the week changes.
-  useEffect(() => {
-    const deliveryDay = getDeliveryDay(dayOfWeek); // Get the delivery day based on the selected ordering day
+useEffect(() => {
+    // ...
+  }, [dayOfWeek, initialFruitsAndMediums, parLevelsByDay]);
 
     const newFruitData = initialFruitsAndMediums.map(fruit => ({
       ...fruit,
